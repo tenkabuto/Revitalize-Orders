@@ -1,12 +1,16 @@
-# Order Pull
-Creates a new admin page containing only a table, one that's filled with precisely the information you need from the orders you're focusing on.
+# Revitalize Orders
+When transitioning from Jigoshop to WooCommerce, Jigoshop's deletion causes a purge of database items that are related to it. Luckily for people that had been using WooCommerce prior to Jigoshop's deletion, WooCommerce preserves most important information about your Products and Orders, but Orders' statuses get purged along with Jigoshop.
+
+This plugin helps you restore your Orders' statuses so that you can get back to fulfilling orders.
 
 ## Roadmap
-1. Create new admin page
-2. List it in the admin menu
-3. Output a table
-4. Make sure that the page is viewable only by admins, not just anyone with the URL
-5. Fill the table with info wanted
-    * Ship-To Name (First and Last Names)
-    * Shipping Address (Street Name, City, State, Zip Code)
-6. Restrict orders pulled to those between an order # range
+This code does/will do the following:
+
+1. Query all orders
+2. Check each for "zombie" (pending) status
+3. IF zombie, retrieve last two comments
+4. Search comments for last indicator of status update
+    1. Match case
+    2. IF match, put in array
+5. Change order status to reflect "last" status update
+    1. @"Last": First in array, as will be retrieving comments in descending order

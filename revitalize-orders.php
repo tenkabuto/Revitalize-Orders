@@ -1,21 +1,21 @@
 <?php
 /*
-Plugin Name: Order Pull
+Plugin Name: Revitalize Orders
 Version: 0.1
-Plugin URI: https://github.com/tenkabuto/order-pull
+Plugin URI: https://github.com/tenkabuto/Revitalize-Orders
 Author: Brandon Hall
 Author URI: http://brandon.zeroqualms.net
-Description: Outputting only the WooCommerce order info you need so you can get back to working your magic.
+Description: Transitioning from Jigoshop to WooCommerce can leave your orders' statuses grey and dead-looking. This helps you put back what went missing: your orders' true statuses.
 */
 global $wp_version;
   
-$exit_msg = 'Order Pull requires both the plugin "WooCommerce" and WordPress 3.5 or newer. <a href="http://codex.wordpress.org/Upgrading_WordPress">Please update!</a>';
+$exit_msg = 'Revitalize Orders requires both the plugin "WooCommerce" and WordPress 3.5 or newer. <a href="http://codex.wordpress.org/Upgrading_WordPress">Please update!</a>';
 
 if ( version_compare($wp_version, "3.5", "<") && class_exists('Woocommerce') ) {
   exit($exit_msg);
 }
 
-class OrderPull {
+class RevitalizeOrders {
 	var $plugin_url;
 	
 	// For the time being, let's effectively setup a useless page
@@ -74,7 +74,7 @@ class OrderPull {
 	}
 	
 	// Initialize the plugin
-	function OrderPull() {
+	function RevitalizeOrders() {
 		$this->plugin_url = trailingslashit( WP_PLUGIN_URL.'/'.dirname( plugin_basename(__FILE__) ));
 		
 		// Add page
@@ -84,14 +84,14 @@ class OrderPull {
 	// Hook the options page
 	function admin_menu() {
 		// The designation of add_MANAGEMENT_page causes the menu item to be listed under the Tools menu!
-		add_management_page('Order Pull Output', 'Order Pull', 'edit_posts', basename(__FILE__), array(&$this, 'page_handler'));
+		add_management_page('Revitalize Orders Output', 'Revitalize Orders', 'edit_posts', basename(__FILE__), array(&$this, 'page_handler'));
 	}
 }
 
 // Create a new instance of the class
-$OrderPull = new OrderPull();
-if (isset($OrderPull)) {
+$RevitalizeOrders = new RevitalizeOrders();
+if (isset($RevitalizeOrders)) {
 	// Register the activation function by passing the reference to my instance
-	register_activation_hook( __FILE__, array(&$OrderPull, 'OrderPull') );
+	register_activation_hook( __FILE__, array(&$RevitalizeOrders, 'RevitalizeOrders') );
 }
 ?>
