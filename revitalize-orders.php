@@ -30,7 +30,7 @@ class RevitalizeOrders {
 		
 		$main_query->query(array(
 			'post_type' => 'shop_order',
-			'posts_per_page' => '-1'
+			'posts_per_page' => '2'
 			)
 		);
 		
@@ -58,6 +58,8 @@ class RevitalizeOrders {
 				// Comment Loop
 				if ( $comments ) {
 					foreach ( $comments as $comment ) {
+					
+						echo "<li>A comment's (#".$comment->comment_ID.", in fact) been touched.</li>";
 
 						$vital_check = preg_match("/.*Order status changed from .* to (.*)./", $comment->comment_content);
 						$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
@@ -78,6 +80,9 @@ class RevitalizeOrders {
 				}
 			}
 			while ($vital_check == '0');
+			
+			// A test message to see which message is being tapped.
+			echo "<li>A post's (#".get_the_ID().", in fact) been touched.</li>";
 		
 		endwhile;
 		
