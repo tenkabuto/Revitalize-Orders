@@ -20,31 +20,49 @@ class RevitalizeOrders {
 	
 	// For the time being, let's effectively setup a useless page
 	function page_handler() {
-		print '<div class="wrap">';
+		print '<div class="wrap">
+			<ul>';
 		
 		// Query all orders
-		$ro_main_query = new WP_Query();
+		$main_query = new WP_Query();
 		
-		$ro_main_query->query(array(
+		$main_query->query(array(
 			'post_type' => 'shop_order',
 			'tax_query' => array(
-				array(
 					'taxonomy' => 'shop_order_status',
 					'field' => 'slug',
 					'terms' => 'pending'
-				)),
+				),
 			'posts_per_page' => '-1'
 			)
 		);
 		
-		// the main query's loop
-		while ($ro_main_query->have_posts()) : $ro_main_query->the_post();
+		while ($main_query->have_posts()) : $main_query->the_post();
 
-			// Individual checks go here
+			global $wpdb;
+
+			// The Query
+			$comments = $wpdb->get_results ("SELECT *
+				FROM $wpdb->comments
+				WHERE comment_approved = '1' AND comment_type = 'order_note' AND comment_post_ID=".get_the_ID()."
+				ORDER BY comment_date_gmt DESC
+				LIMIT 2");
+
+			// Comment Loop
+			if ( $comments ) {
+				foreach ( $comments as $comment ) {
+					// Get comment info and replace as status intended
+					$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
+					echo '<li>Order #' . $comment->comment_post_ID . ' would be "' . $vital_status . '"!</li>';
+				}
+			} else {
+				echo 'No comments found.' . $comments->comment_content;
+			}
 		
 		endwhile;
 		
-		print '</div>';
+		print '</ul>
+		</div>';
 	}
 	
 	// Initialize the plugin
