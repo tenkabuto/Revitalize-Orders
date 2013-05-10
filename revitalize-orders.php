@@ -58,8 +58,6 @@ class RevitalizeOrders {
 				// Comment Loop
 				if ( $comments ) {
 					foreach ( $comments as $comment ) {
-					
-						echo "<li>A comment's (#".$comment->comment_ID.", in fact) been touched.</li>";
 
 						$vital_check = preg_match("/.*Order status changed from .* to (.*)./", $comment->comment_content);
 						$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
@@ -73,11 +71,21 @@ class RevitalizeOrders {
 							// Update order status with extracted $vital_status
 							$order->update_status($vital_status, 'Revitalized!');
 							
+							echo "<li>A comment's (#".$comment->comment_ID.", in fact) been touched.</li>";
+							
+							break;
+							
 						} else {
 							$offset++;
 						}
+						
+						break;
+						
 					}
 				}
+				
+				break;
+				
 			}
 			while ($vital_check == '0');
 			
