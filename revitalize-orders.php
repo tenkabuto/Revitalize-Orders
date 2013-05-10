@@ -30,7 +30,7 @@ class RevitalizeOrders {
 		
 		$main_query->query(array(
 			'post_type' => 'shop_order',
-			'posts_per_page' => '2'
+			'posts_per_page' => '3'
 			)
 		);
 		
@@ -73,10 +73,12 @@ class RevitalizeOrders {
 							
 							echo "<li>A comment's (#".$comment->comment_ID.", in fact) been touched.</li>";
 							
-							break;
-							
+						} else if ($vital_check == '0') {
+							$offset++;
+							echo "vital_check equals 0";
 						} else {
 							$offset++;
+							echo "vital_check equals 'false'";
 						}
 						
 						break;
@@ -87,7 +89,7 @@ class RevitalizeOrders {
 				break;
 				
 			}
-			while ($vital_check == '0');
+			while ($vital_check === '0');
 			
 			// A test message to see which message is being tapped.
 			echo "<li>A post's (#".get_the_ID().", in fact) been touched.</li>";
