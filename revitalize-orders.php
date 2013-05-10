@@ -30,11 +30,6 @@ class RevitalizeOrders {
 		
 		$main_query->query(array(
 			'post_type' => 'shop_order',
-			'tax_query' => array(
-					'taxonomy' => 'shop_order_status',
-					'field' => 'slug',
-					'terms' => 'pending'
-				),
 			'posts_per_page' => '-1'
 			)
 		);
