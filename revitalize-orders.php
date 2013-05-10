@@ -63,11 +63,12 @@ class RevitalizeOrders {
 				// Comment Loop
 				if ( $comments ) {
 					foreach ( $comments as $comment ) {
+
 						$vital_check = preg_match("/.*Order status changed from .* to (.*)./", $comment->comment_content);
 						$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
 						
 						// Check if comment is a match to Woo template
-						if ( $vital_check == true ) {
+						if ( $vital_check == '1' ) {
 						
 							// Extract $vital_status
 							$order = new WC_Order(get_the_ID());
@@ -81,9 +82,7 @@ class RevitalizeOrders {
 					}
 				}
 			}
-			while ($vital_check == false);
-			
-			return $offset = '0';
+			while ($vital_check == '0');
 		
 		endwhile;
 		
