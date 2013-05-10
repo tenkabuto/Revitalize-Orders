@@ -15,6 +15,8 @@ if ( version_compare($wp_version, "3.5", "<") && class_exists('Woocommerce') ) {
   exit($exit_msg);
 }
 
+global $woocommerce;
+
 class RevitalizeOrders {
 	var $plugin_url;
 	
@@ -30,34 +32,58 @@ class RevitalizeOrders {
 			'post_type' => 'shop_order',
 			'tax_query' => array(
 					'taxonomy' => 'shop_order_status',
-					'field' => 'slug',
-					'terms' => 'pending'
+					'field' => 'slug'
+					// 'field' => 'slug',
+					// 'terms' => 'pending'
 				),
 			'posts_per_page' => '-1'
 			)
 		);
 		
 		while ($main_query->have_posts()) : $main_query->the_post();
-
+		
 			global $wpdb;
-
-			// The Query
-			$comments = $wpdb->get_results ("SELECT *
-				FROM $wpdb->comments
-				WHERE comment_approved = '1' AND comment_type = 'order_note' AND comment_post_ID=".get_the_ID()."
-				ORDER BY comment_date_gmt DESC
-				LIMIT 2");
-
-			// Comment Loop
-			if ( $comments ) {
-				foreach ( $comments as $comment ) {
-					// Get comment info and replace as status intended
-					$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
-					echo '<li>Order #' . $comment->comment_post_ID . ' would be "' . $vital_status . '"!</li>';
+		
+			do {
+				$offset = '0';
+				if ( $offset != '0' ) {
+					$db_offset = " OFFSET " . $offset;
+				} else {
+					$db_offset = '';
 				}
-			} else {
-				echo 'No comments found.' . $comments->comment_content;
+				
+				// Check comments until a solid match is found
+				// The Query
+				$comments = $wpdb->get_results ("SELECT *
+					FROM $wpdb->comments
+					WHERE comment_approved = '1' AND comment_type = 'order_note' AND comment_post_ID=".get_the_ID()."
+					ORDER BY comment_date_gmt DESC
+					LIMIT 1" . $db_offset);
+
+				// Comment Loop
+				if ( $comments ) {
+					foreach ( $comments as $comment ) {
+						$vital_check = preg_match("/.*Order status changed from .* to (.*)./", $comment->comment_content);
+						$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
+						
+						// Check if comment is a match to Woo template
+						if ( $vital_check == true ) {
+						
+							// Extract $vital_status
+							$order = new WC_Order(get_the_ID());
+							
+							// Update order status with extracted $vital_status
+							$order->update_status($vital_status, 'Revitalized!');
+							
+						} else {
+							$offset++;
+						}
+					}
+				}
 			}
+			while ($vital_check == false);
+			
+			return $offset = '0';
 		
 		endwhile;
 		
