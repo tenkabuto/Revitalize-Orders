@@ -43,9 +43,10 @@ class RevitalizeOrders {
 		while ($main_query->have_posts()) : $main_query->the_post();
 		
 			global $wpdb;
+
+			$offset = '0';
 		
 			do {
-				$offset = '0';
 				if ( $offset != '0' ) {
 					$db_offset = " OFFSET " . $offset;
 				} else {
