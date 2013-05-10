@@ -32,9 +32,8 @@ class RevitalizeOrders {
 			'post_type' => 'shop_order',
 			'tax_query' => array(
 					'taxonomy' => 'shop_order_status',
-					'field' => 'slug'
-					// 'field' => 'slug',
-					// 'terms' => 'pending'
+					'field' => 'slug',
+					'terms' => 'pending'
 				),
 			'posts_per_page' => '-1'
 			)
