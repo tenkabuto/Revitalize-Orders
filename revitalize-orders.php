@@ -58,8 +58,7 @@ class RevitalizeOrders {
 		
 		while ($second_query->have_posts()) : $second_query->the_post();
 			
-			echo get_the_ID();
-			echo "<li>Order #".get_the_ID()." is a zombie!</li>"
+			echo "<li>Order #".get_the_ID()." is a zombie!</li>";
 		
 		endwhile;
 		
