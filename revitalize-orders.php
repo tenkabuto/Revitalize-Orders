@@ -28,21 +28,15 @@ class RevitalizeOrders {
 		// Query all orders
 		$first_query = new WP_Query();
 		
-		$first_query->query(array(
-			'post_type' => 'shop_order',
-			'tax_query' => array(
-				'taxonomy' => 'shop_order_status',
-				'field' => 'slug'
-				),
-			'posts_per_page' => '-1'
-			)
-		);
+		$first_query->query('p=4291');
 		
 		$are_alive = array();
 		
 		while ($first_query->have_posts()) : $first_query->the_post();
 			
-			$are_alive[] = get_the_ID();
+			// $are_alive[] = get_the_ID();
+			
+			the_terms( $post->ID, 'shop_order_status', 'Order Status: ', '"', '"' );
 		
 		endwhile;
 		
