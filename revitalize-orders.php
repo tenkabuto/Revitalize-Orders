@@ -28,7 +28,11 @@ class RevitalizeOrders {
 		// Query all orders
 		$first_query = new WP_Query();
 		
-		$first_query->query('p=4291');
+		$first_query->query(array(
+			'post_type' => 'shop_order',
+			'posts_per_page' => '-1'
+			)
+		);
 		
 		$are_alive = array();
 		
