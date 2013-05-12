@@ -38,9 +38,9 @@ class RevitalizeOrders {
 		
 		while ($first_query->have_posts()) : $first_query->the_post();
 			
-			// $are_alive[] = get_the_ID();
-			
-			the_terms( $post->ID, 'shop_order_status', 'Order Status: ', '"', '"' );
+			if ( !is_object_in_term( get_the_ID(), 'shop_order_status' ) ) :
+				$are_alive[] = get_the_ID();
+			endif;
 		
 		endwhile;
 		
@@ -49,17 +49,12 @@ class RevitalizeOrders {
 		
 		$second_query->query(array(
 			'post_type' => 'shop_order',
-			'post__not_in' => $are_alive,
+			'post__in' => $are_alive,
 			'posts_per_page' => '-1'
 			)
 		);
 		
 		while ($second_query->have_posts()) : $second_query->the_post();
-			if ( is_object_in_term( get_the_ID(), 'shop_order_status' ) ) :
-				$terms = 'YES';
-			else :
-				$terms = 'NO';
-			endif;
 			
 			echo "<li>Order #".get_the_ID()." is a zombie!</li>";
 		
