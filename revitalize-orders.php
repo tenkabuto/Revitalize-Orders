@@ -25,41 +25,88 @@ class RevitalizeOrders {
 		print '<div class="wrap">
 			<ul>';
 		
-		// Query all orders
 		$first_query = new WP_Query();
 		
+		// Query all orders
 		$first_query->query(array(
 			'post_type' => 'shop_order',
-			'tax_query' => array(
-				'taxonomy' => 'shop_order_status',
-				'field' => 'slug'
-				),
 			'posts_per_page' => '-1'
 			)
 		);
 		
-		$are_alive = array();
+		$not_alive = array();
 		
 		while ($first_query->have_posts()) : $first_query->the_post();
 			
-			$are_alive[] = get_the_ID();
+			// Finds all orders lacking signs of life
+			if ( !is_object_in_term( get_the_ID(), 'shop_order_status' ) ) :
+				$not_alive[] = get_the_ID();
+			endif;
 		
 		endwhile;
 		
-		// Query all orders BUT those contained in the $are_alive array
 		$second_query = new WP_Query();
 		
+		// Query all orders BUT those contained in the $not_alive array
 		$second_query->query(array(
 			'post_type' => 'shop_order',
-			'post__not_in' => $are_alive,
+			'post__in' => $not_alive,
 			'posts_per_page' => '-1'
 			)
 		);
 		
 		while ($second_query->have_posts()) : $second_query->the_post();
 			
-			echo get_the_ID();
-			echo "<li>Order #".get_the_ID()." is a zombie!</li>"
+			global $wpdb;
+
+			$offset = '0';
+		
+			do {
+				if ( $offset != '0' ) {
+					$db_offset = " OFFSET " . $offset;
+				} else {
+					$db_offset = '';
+				}
+				
+				// Check comments until a solid match is found
+				// The Query
+				$comments = $wpdb->get_results ("SELECT *
+					FROM $wpdb->comments
+					WHERE comment_approved = '1' AND comment_type = 'order_note' AND comment_post_ID=".get_the_ID()."
+					ORDER BY comment_date_gmt DESC
+					LIMIT 1" . $db_offset);
+
+				// Looping through comments to find last true indication of life
+				if ( $comments ) {
+					foreach ( $comments as $comment ) {
+
+						$vital_check = preg_match("/.*Order status changed from .* to (.*)./", $comment->comment_content);
+						$vital_status = preg_replace("/.*Order status changed from .* to (.*)./", "$1", $comment->comment_content);
+						
+						// Check if comment is a match to Woo template
+						if ( $vital_check == '1' ) {
+						
+							// Extract $vital_status
+							$order = new WC_Order(get_the_ID());
+							
+							// Update order status with extracted $vital_status
+							$order->update_status($vital_status, 'Revitalized!');
+							
+							echo '<li>Order #'.get_the_ID().' has been revitalized, due to its previously logged state of "'.$vital_status.'"!';
+
+						} else {
+							$offset++;
+						}
+						
+						break;
+						
+					}
+				}
+				
+				break;
+				
+			}
+			while ($vital_check == '0');
 		
 		endwhile;
 		
