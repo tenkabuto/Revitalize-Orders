@@ -51,6 +51,11 @@ class RevitalizeOrders {
 		);
 		
 		while ($second_query->have_posts()) : $second_query->the_post();
+			if ( is_object_in_term( get_the_ID(), 'shop_order_status' ) ) :
+				$terms = 'YES';
+			else :
+				$terms = 'NO';
+			endif;
 			
 			echo "<li>Order #".get_the_ID()." is a zombie!</li>";
 		
